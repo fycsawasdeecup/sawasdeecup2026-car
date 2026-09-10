@@ -383,9 +383,7 @@ function renderVehicles(){
     return '<label data-v="'+v.id+'" class="'+(checked?'sel':'')+'">' +
       '<input type="radio" name="veh" value="'+v.id+'" '+(checked?'checked':'')+'>' +
       '<span class="vt">'+(LANG==='th'?v.th:v.en)+'</span>' +
-      '<span class="vs">'+(v.id==='Bus 50'
-          ? (LANG==='th'?'สูงสุด 50 ท่าน · รอเสนอราคา':'up to 50 pax · Quote only')
-          : (LANG==='th'?('สูงสุด '+v.cap+' ท่าน'):('up to '+v.cap+' pax')))+'</span></label>';
+      '<span class="vs">'+(LANG==='th'?('สูงสุด '+v.cap+' ท่าน'):('up to '+v.cap+' pax'))+'</span></label>';
   }).join('');
   box.querySelectorAll('label').forEach(function(l){
     l.onclick = function(){
