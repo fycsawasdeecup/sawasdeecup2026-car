@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>แดชบอร์ดจองรถ / Transfer Dashboard — Sawasdee Cup 2026</title>
+<style>
+  :root{--navy:#1f3864;--ink:#14181f;--muted:#5b6472;--line:#e3e6eb;--bg:#f4f6f9;
+        --ok:#0f7b4f;--warn:#8a5a00;--bad:#a2271b;--gold:#c9a227}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai",Helvetica,Arial,sans-serif}
+  header{background:var(--navy);color:#fff;padding:16px 22px;display:flex;
+         justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0;font-weight:700}
+  header .sub{font-size:12px;opacity:.75}
+  .hbtns{display:flex;gap:8px;flex-wrap:wrap}
+  .hbtn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);color:#fff;
+        border-radius:8px;padding:7px 13px;font:inherit;font-size:13px;cursor:pointer;text-decoration:none}
+  .hbtn:hover{background:rgba(255,255,255,.26)}
+  .wrap{padding:18px 22px 60px;max-width:1500px;margin:0 auto}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin-bottom:16px}
+  .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .kpi .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .kpi .v{font-size:23px;font-weight:700;margin-top:3px;letter-spacing:-.01em}
+  .kpi .m{font-size:12px;color:var(--muted);margin-top:1px}
+  .kpi.rev .v{color:var(--navy)} .kpi.pro .v{color:var(--ok)} .kpi.q .v{color:var(--warn)}
+
+  .bar{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+       display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+  .fld label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em}
+  .fld input,.fld select{padding:7px 10px;border:1px solid var(--line);border-radius:8px;font:inherit;font-size:13px;background:#fff}
+  .fld input[type=search]{min-width:220px}
+  .btn{padding:8px 14px;border:1px solid var(--line);background:#fff;border-radius:8px;
+       font:inherit;font-size:13px;cursor:pointer}
+  .btn:hover{background:#f4f6f9}
+  .btn.p{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .btn.p:hover{filter:brightness(1.12)}
+  .spacer{flex:1}
+
+  .tablewrap{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:auto}
+  table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+  th{background:#f7f9fb;text-align:left;padding:10px 11px;font-size:11px;color:var(--muted);
+     text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--line);
+     position:sticky;top:0;z-index:2;cursor:pointer;user-select:none}
+  th:hover{color:var(--ink)}
+  td{padding:9px 11px;border-bottom:1px solid #eef1f4;vertical-align:top}
+  tr:hover td{background:#fafbfd}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .id{font-weight:700;color:var(--navy)}
+  .sm{font-size:11.5px;color:var(--muted);white-space:normal;max-width:230px}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600}
+  .s-New{background:#e8effb;color:#1f3864}
+  .s-Confirmed{background:#e8f5ef;color:#0f7b4f}
+  .s-Assigned{background:#eef0f4;color:#3a4150}
+  .s-Completed{background:#eef0f4;color:#8a93a2}
+  .s-Cancelled{background:#fdecea;color:#a2271b}
+  .s-Quote{background:#fff7e6;color:#8a5a00}
+  select.inline,input.inline{border:1px solid transparent;background:transparent;padding:3px 5px;
+       border-radius:6px;font:inherit;font-size:12.5px;width:100%;min-width:88px}
+  select.inline:hover,input.inline:hover{border-color:var(--line);background:#fff}
+  .empty{padding:44px;text-align:center;color:var(--muted)}
+  .toast{position:fixed;right:18px;bottom:18px;background:var(--ink);color:#fff;padding:11px 16px;
+         border-radius:99px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:9}
+  .toast.on{opacity:1}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  @media(max-width:900px){.split{grid-template-columns:1fr}}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .panel h3{margin:0 0 10px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .brow{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:13px}
+  .brow .lab{width:150px;flex:none;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brow .track{flex:1;height:9px;background:#eef1f4;border-radius:99px;overflow:hidden}
+  .brow .fill{height:100%;background:var(--navy);border-radius:99px}
+  .brow .n{width:64px;text-align:right;font-variant-numeric:tabular-nums;flex:none}
+
+  .auth-box{max-width:400px;margin:80px auto;padding:30px;background:#fff;border-radius:14px;
+            border:1px solid var(--line);text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+</style>
+</head>
+<body>
+
+<div id="authArea" style="display:none">
+  <div class="auth-box">
+    <h2 style="margin-top:0">🔒 เข้าสู่แดชบอร์ดแอดมิน</h2>
+    <p style="color:var(--muted);font-size:13px">กรุณากรอกรหัสแอดมิน (ADMIN KEY) ที่ได้ตอนติดตั้ง</p>
+    <input type="password" id="keyInput" placeholder="กรอกรหัส ADMIN KEY" style="width:100%;padding:10px;margin:12px 0;border:1px solid var(--line);border-radius:8px;font-size:14px">
+    <button class="btn p" style="width:100%;padding:10px" onclick="submitKey()">เข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<div id="mainArea" style="display:none">
+  <header>
+    <div>
+      <h1>🚐 แดชบอร์ดจองรถ / Transfer Dashboard</h1>
+      <div class="sub" id="ev"></div>
+    </div>
+    <div class="hbtns">
+      <a class="hbtn" id="driverLink" target="_blank">📋 ใบงานคนขับ</a>
+      <button class="hbtn" onclick="exportCsv()">⬇ Export CSV</button>
+      <button class="hbtn" onclick="recalc()">↻ คำนวณราคาใหม่</button>
+      <button class="hbtn" onclick="load()">⟳ รีเฟรช</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="bar">
+      <div class="fld"><label>ค้นหา</label>
+        <input type="search" id="q" placeholder="ชื่อ / ทีม / เที่ยวบิน / Booking ID"></div>
+      <div class="fld"><label>สถานะ</label><select id="fStatus"><option value="">ทั้งหมด</option></select></div>
+      <div class="fld"><label>สนามบิน</label><select id="fAir">
+        <option value="">ทั้งหมด</option><option>Don Mueang</option>
+        <option>Suvarnabhumi</option><option>U-Tapao</option><option>Bangkok</option></select></div>
+      <div class="fld"><label>ประเภทรถ</label><select id="fVeh"><option value="">ทั้งหมด</option></select></div>
+      <div class="fld"><label>วันที่ถึง ตั้งแต่</label><input type="date" id="fFrom"></div>
+      <div class="fld"><label>ถึง</label><input type="date" id="fTo"></div>
+      <button class="btn" onclick="clearF()">ล้างตัวกรอง</button>
+      <div class="spacer"></div>
+      <div style="font-size:12px;color:var(--muted)" id="count"></div>
+    </div>
+
+    <div class="split">
+      <div class="panel"><h3>รายได้ตามประเภทรถ / Revenue by vehicle</h3><div id="byVeh"></div></div>
+      <div class="panel"><h3>เที่ยวรถตามวัน / Transfers by date</h3><div id="byDate"></div></div>
+    </div>
+
+    <div class="tablewrap">
+      <table>
+        <thead><tr id="thead"></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>ยังไม่มีรายการจอง</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- โหลดไฟล์การตั้งค่า API -->
+<script src="config.js"></script>
+
+<script>
+var SERVER_KEY = '<?= typeof adminKey !== "undefined" ? adminKey : "" ?>';
+var SERVER_URL = '<?= typeof webAppUrl !== "undefined" ? webAppUrl : "" ?>';
+
+var KEY = '';
+var DATA = { bookings: [], drivers: [], statuses: [] };
+var SORT = { col: 'arrDate', dir: 1 };
+
+var COLDEF = [
+  {k:'bookingId', t:'Booking'},
+  {k:'status',    t:'สถานะ'},
+  {k:'arrDate',   t:'วันรับ'},
+  {k:'arrTime',   t:'เวลา'},
+  {k:'fullName',  t:'ผู้โดยสาร'},
+  {k:'arrFrom',   t:'จาก'},
+  {k:'arrTo',     t:'ไป'},
+  {k:'vehicle',   t:'รถ'},
+  {k:'pax',       t:'คน', num:true},
+  {k:'qty',       t:'คัน', num:true},
+  {k:'tripType',  t:'ประเภท'},
+  {k:'total',     t:'ราคาขาย', num:true},
+  {k:'cost',      t:'ต้นทุน', num:true},
+  {k:'profit',    t:'กำไร', num:true},
+  {k:'driver',    t:'คนขับ'},
+  {k:'plate',     t:'ทะเบียน'},
+  {k:'note',      t:'โน้ต'}
+];
+
+function money(n){ return Number(n||0).toLocaleString('en-US'); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function toast(m){ var t=document.getElementById('toast'); t.textContent=m;
+  t.classList.add('on'); setTimeout(function(){t.classList.remove('on');}, 2200); }
+
+function getApiUrl() {
+  if (typeof SERVER_URL !== 'undefined' && SERVER_URL && SERVER_URL.indexOf('<?') !== 0) {
+    return SERVER_URL;
+  }
+  return typeof CONFIG !== 'undefined' ? CONFIG.getApiUrl() : '';
+}
+
+function getAdminKey() {
+  if (typeof SERVER_KEY !== 'undefined' && SERVER_KEY && SERVER_KEY.indexOf('<?') !== 0) {
+    return SERVER_KEY;
+  }
+  var params = new URLSearchParams(window.location.search);
+  var k = params.get('key');
+  if (k && k.trim()) {
+    sessionStorage.setItem('swc26_adminkey', k.trim());
+    return k.trim();
+  }
+  return sessionStorage.getItem('swc26_adminkey') || '';
+}
+
+function submitKey() {
+  var val = document.getElementById('keyInput').value.trim();
+  if (val) {
+    sessionStorage.setItem('swc26_adminkey', val);
+    KEY = val;
+    document.getElementById('authArea').style.display = 'none';
+    document.getElementById('mainArea').style.display = '';
+    load();
+  }
+}
+
+async function load(){
+  var apiUrl = getApiUrl();
+  if (!apiUrl) {
+    toast('ยังไม่ได้ระบุ Web App URL ใน config.js');
+    return;
+  }
+  if (!KEY) {
+    document.getElementById('authArea').style.display = '';
+    document.getElementById('mainArea').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('authArea').style.display = 'none';
+  document.getElementById('mainArea').style.display = '';
+
+  try {
+    var res = await fetch(apiUrl + (apiUrl.indexOf('?') >= 0 ? '&' : '?') + 'action=adminGetAll&key=' + encodeURIComponent(KEY));
+    var d = await res.json();
+    if (d.unauthorized || d.error) {
+      if (d.unauthorized) {
+        sessionStorage.removeItem('swc26_adminkey');
+        KEY = '';
+        document.getElementById('authArea').style.display = '';
+        document.getElementById('mainArea').style.display = 'none';
+        toast('รหัสแอดมินไม่ถูกต้อง (Invalid Admin Key)');
+        return;
+      }
+      throw new Error(d.error);
+    }
+
+    DATA = d;
+    document.getElementById('ev').textContent = d.event || '';
+
+    // สร้างลิงก์ใบงานคนขับอย่างถูกต้อง
+    var driverUrl = 'driver.html?key=' + encodeURIComponent(KEY);
+    var pApi = new URLSearchParams(window.location.search).get('api');
+    if (pApi) driverUrl += '&api=' + encodeURIComponent(pApi);
+    document.getElementById('driverLink').href = driverUrl;
+
+    var fs = document.getElementById('fStatus');
+    if (fs.options.length <= 1 && d.statuses) {
+      d.statuses.forEach(function(s){ fs.add(new Option(s, s)); });
+    }
+    var vs = document.getElementById('fVeh');
+    if (vs.options.length <= 1 && d.bookings) {
+      var seen = {};
+      d.bookings.forEach(function(b){ if(b.vehicle && !seen[b.vehicle]){ seen[b.vehicle]=1; vs.add(new Option(b.vehicle, b.vehicle)); } });
+    }
+    render();
+  } catch (err) {
+    toast('โหลดข้อมูลไม่สำเร็จ: ' + err.message);
+  }
+}
+
+function filtered(){
+  var q = document.getElementById('q').value.trim().toLowerCase();
+  var st = document.getElementById('fStatus').value;
+  var air = document.getElementById('fAir').value;
+  var veh = document.getElementById('fVeh').value;
+  var f = document.getElementById('fFrom').value;
+  var t = document.getElementById('fTo').value;
+
+  return DATA.bookings.filter(function(b){
+    if (st && b.status !== st) return false;
+    if (veh && b.vehicle !== veh) return false;
+    if (air && b.arrFrom !== air && b.depTo !== air) return false;
+    if (f && b.arrDate && b.arrDate < f) return false;
+    if (t && b.arrDate && b.arrDate > t) return false;
+    if (q){
+      var hay = [b.bookingId,b.fullName,b.team,b.email,b.phone,b.arrFlight,b.depFlight,
+                 b.arrTo,b.depFrom,b.driver,b.plate].join(' ').toLowerCase();
+      if (hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+}
+
+function kpis(rows){
+  var pax=0, rev=0, cost=0, quotes=0, legs=0;
+  rows.forEach(function(b){
+    pax += Number(b.pax)||0; rev += b.total; cost += b.cost;
+    if (b.status === 'Quote') quotes++;
+    legs += (b.tripType === 'Round trip' ? 2 : 1) * (b.vehicle === 'Shared ride' ? 1 : (Number(b.qty)||1));
+  });
+  var profit = rev - cost;
+  var margin = rev > 0 ? Math.round(profit / rev * 100) : 0;
+  document.getElementById('kpis').innerHTML =
+    card('รายการจอง', rows.length, 'bookings') +
+    card('ผู้โดยสารรวม', pax, 'passengers') +
+    card('เที่ยวรถ', legs, 'vehicle legs') +
+    card('รายได้', money(rev)+' ฿', 'revenue', 'rev') +
+    card('ต้นทุน', money(cost)+' ฿', 'cost') +
+    card('กำไร', money(profit)+' ฿', margin+'% margin', 'pro') +
+    card('รอเสนอราคา', quotes, 'need a quote', 'q');
+}
+function card(k,v,m,cls){
+  return '<div class="kpi '+(cls||'')+'"><div class="k">'+k+'</div><div class="v">'+v+
+         '</div><div class="m">'+m+'</div></div>';
+}
+
+function bars(id, map, isMoney){
+  var keys = Object.keys(map).sort();
+  var max = 0; keys.forEach(function(k){ if(map[k] > max) max = map[k]; });
+  document.getElementById(id).innerHTML = keys.length ? keys.map(function(k){
+    return '<div class="brow"><div class="lab">'+esc(k)+'</div>' +
+      '<div class="track"><div class="fill" style="width:'+(max? (map[k]/max*100):0)+'%"></div></div>' +
+      '<div class="n">'+(isMoney ? money(map[k]) : map[k])+'</div></div>';
+  }).join('') : '<div style="color:var(--muted);font-size:13px">ไม่มีข้อมูล</div>';
+}
+
+function render(){
+  var rows = filtered();
+  kpis(rows);
+
+  var mv = {}, md = {};
+  rows.forEach(function(b){
+    mv[b.vehicle||'—'] = (mv[b.vehicle||'—']||0) + b.total;
+    if (b.arrDate) md[b.arrDate] = (md[b.arrDate]||0) + 1;
+    if (b.tripType === 'Round trip' && b.depDate) md[b.depDate] = (md[b.depDate]||0) + 1;
+  });
+  bars('byVeh', mv, true);
+  bars('byDate', md, false);
+
+  rows.sort(function(a,b){
+    var x = a[SORT.col], y = b[SORT.col];
+    if (typeof x === 'number' && typeof y === 'number') return (x-y)*SORT.dir;
+    return String(x||'').localeCompare(String(y||'')) * SORT.dir;
+  });
+
+  document.getElementById('thead').innerHTML = COLDEF.map(function(c){
+    return '<th onclick="sortBy(\''+c.k+'\')">'+c.t+
+      (SORT.col===c.k ? (SORT.dir>0?' ▲':' ▼') : '')+'</th>';
+  }).join('');
+
+  document.getElementById('tbody').innerHTML = rows.map(function(b){
+    var td = [];
+    td.push('<td class="id">'+esc(b.bookingId)+'</td>');
+    td.push('<td><select class="inline" onchange="upd(\''+esc(b.bookingId)+'\',{status:this.value})">' +
+      DATA.statuses.map(function(s){
+        return '<option '+(s===b.status?'selected':'')+'>'+esc(s)+'</option>'; }).join('') +
+      '</select><br><span class="pill s-'+esc(b.status)+'">'+esc(b.status)+'</span></td>');
+    td.push('<td>'+esc(b.arrDate)+'</td>');
+    td.push('<td>'+esc(b.arrTime)+'<div class="sm">'+esc(b.arrFlight)+'</div></td>');
+    td.push('<td>'+esc(b.fullName)+'<div class="sm">'+esc(b.team||'')+
+            (b.phone?' · '+esc(b.phone):'')+'</div></td>');
+    td.push('<td>'+esc(b.arrFrom)+'</td>');
+    td.push('<td class="sm">'+esc(b.arrTo)+'</td>');
+    td.push('<td>'+esc(b.vehicle)+'</td>');
+    td.push('<td class="num">'+esc(b.pax)+'</td>');
+    td.push('<td class="num">'+esc(b.qty)+'</td>');
+    td.push('<td>'+esc(b.tripType)+ (b.tripType==='Round trip' && b.depDate
+            ? '<div class="sm">กลับ '+esc(b.depDate)+' '+esc(b.depTime)+'</div>' : '')+'</td>');
+    td.push('<td class="num">'+money(b.total)+'</td>');
+    td.push('<td class="num">'+money(b.cost)+'</td>');
+    td.push('<td class="num" style="color:'+(b.profit>=0?'var(--ok)':'var(--bad)')+'">'+money(b.profit)+'</td>');
+
+    // ตัวเลือกคนขับ พร้อม Auto-populate ทะเบียน
+    var drvOptions = '<option value="">(ยังไม่มอบหมาย)</option>';
+    DATA.drivers.forEach(function(d){
+      var sel = (d.name === b.driver) ? ' selected' : '';
+      drvOptions += '<option value="'+esc(d.name)+'" data-plate="'+esc(d.plate||'')+'"'+sel+'>'+esc(d.name)+(d.plate?' · '+esc(d.plate):'')+'</option>';
+    });
+
+    td.push('<td><select class="inline" onchange="onDriverChange(\''+esc(b.bookingId)+'\', this)">' + drvOptions + '</select></td>');
+    td.push('<td><input id="plate_'+esc(b.bookingId)+'" class="inline" value="'+esc(b.plate)+'" onchange="upd(\''+
+      esc(b.bookingId)+'\',{plate:this.value})"></td>');
+    td.push('<td><input class="inline" value="'+esc(b.note)+'" onchange="upd(\''+
+      esc(b.bookingId)+'\',{note:this.value})"></td>');
+    return '<tr>'+td.join('')+'</tr>';
+  }).join('');
+
+  document.getElementById('empty').hidden = rows.length > 0;
+  document.getElementById('count').textContent = rows.length + ' / ' + DATA.bookings.length + ' รายการ';
+}
+
+function sortBy(k){ if(SORT.col===k) SORT.dir*=-1; else {SORT.col=k; SORT.dir=1;} render(); }
+
+// เมื่อเปลี่ยนคนขับ ให้ดึงทะเบียนรถมาใส่ให้อัตโนมัติ
+function onDriverChange(id, selectEl){
+  var driverName = selectEl.value;
+  var opt = selectEl.options[selectEl.selectedIndex];
+  var plate = opt ? opt.getAttribute('data-plate') : '';
+
+  var patch = { driver: driverName };
+  if (plate) {
+    patch.plate = plate;
+    var plateInput = document.getElementById('plate_' + id);
+    if (plateInput) plateInput.value = plate;
+  }
+  upd(id, patch);
+}
+
+async function upd(id, patch){
+  var apiUrl = getApiUrl();
+  try {
+    var res = await fetch(apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'adminUpdate',
+        key: KEY,
+        bookingId: id,
+        patch: patch
+      })
+    });
+    var r = await res.json();
+    if (r.error) throw new Error(r.error);
+
+    DATA.bookings.forEach(function(b){
+      if(b.bookingId === id) {
+        Object.keys(patch).forEach(function(k){ b[k] = patch[k]; });
+      }
+    });
+    render();
+    toast('บันทึก ' + id + ' แล้ว');
+  } catch (err) {
+    toast('บันทึกไม่สำเร็จ: ' + err.message);
+  }
+}
+
+async function recalc(){
+  if (!confirm('ต้องการคำนวณราคาทั้งหมดใหม่ตามตาราง Pricing ปัจจุบันหรือไม่?')) return;
+  var apiUrl = getApiUrl();
+  try {
+    var res = await fetch(apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'adminRecalcAll',
+        key: KEY
+      })
+    });
+    var r = await res.json();
+    if (r.error) throw new Error(r.error);
+    toast('คำนวณราคาใหม่ ' + r.updated + ' รายการ');
+    load();
+  } catch (err) {
+    toast('ไม่สำเร็จ: ' + err.message);
+  }
+}
+
+function exportCsv(){
+  var rows = filtered();
+  var head = ['Booking ID','Status','Name','Team','Phone','Email','Passport','Pax','Vehicle','Qty','Trip',
+    'Arr Flight','Arr Date','Arr Time','Arr From','Arr To',
+    'Dep Flight','Dep Date','Dep Time','Dep From','Dep To',
+    'Price','Cost','Profit','Driver','Plate','Special','Note'];
+  var lines = [head.join(',')];
+  rows.forEach(function(b){
+    lines.push([b.bookingId,b.status,b.fullName,b.team,b.phone,b.email,b.passport,b.pax,b.vehicle,b.qty,
+      b.tripType,b.arrFlight,b.arrDate,b.arrTime,b.arrFrom,b.arrTo,
+      b.depFlight,b.depDate,b.depTime,b.depFrom,b.depTo,
+      b.total,b.cost,b.profit,b.driver,b.plate,b.special,b.note]
+      .map(function(v){ return '"'+String(v==null?'':v).replace(/"/g,'""')+'"'; }).join(','));
+  });
+  var blob = new Blob(['\ufeff' + lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'transfer-bookings-' + new Date().toLocaleDateString('sv-SE') + '.csv';
+  a.click();
+}
+
+function clearF(){
+  ['q','fStatus','fAir','fVeh','fFrom','fTo'].forEach(function(id){ document.getElementById(id).value=''; });
+  render();
+}
+
+['q','fStatus','fAir','fVeh','fFrom','fTo'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', render);
+  document.getElementById(id).addEventListener('change', render);
+});
+
+KEY = getAdminKey();
+load();
+</script>
+</body>
+</html>

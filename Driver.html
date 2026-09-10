@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ใบงานคนขับ / Driver Job Sheet — Sawasdee Cup 2026</title>
+<style>
+  :root{--navy:#1f3864;--ink:#14181f;--muted:#5b6472;--line:#d9dde3;--bg:#f4f6f9}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-size:14px;
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai",Helvetica,Arial,sans-serif}
+  header{background:var(--navy);color:#fff;padding:14px 22px;display:flex;
+         justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  header h1{font-size:16px;margin:0}
+  .ctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .ctl input,.ctl select{padding:7px 10px;border:0;border-radius:8px;font:inherit;font-size:13px}
+  .hbtn{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff;
+        border-radius:8px;padding:7px 13px;font:inherit;font-size:13px;cursor:pointer}
+  .hbtn:hover{background:rgba(255,255,255,.28)}
+
+  .sheet{max-width:1080px;margin:18px auto 60px;background:#fff;border:1px solid var(--line);
+         border-radius:12px;padding:24px 26px}
+  .head{display:flex;justify-content:space-between;align-items:flex-end;
+        border-bottom:2px solid var(--navy);padding-bottom:12px;margin-bottom:6px}
+  .head .t{font-size:19px;font-weight:700}
+  .head .d{font-size:13px;color:var(--muted)}
+  .head .big{font-size:26px;font-weight:700;color:var(--navy);line-height:1.1}
+
+  .group{margin-top:22px}
+  .group h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#fff;
+            background:var(--navy);display:inline-block;padding:4px 12px;border-radius:6px;margin:0 0 8px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{text-align:left;padding:7px 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;
+     color:var(--muted);border-bottom:1px solid var(--line)}
+  td{padding:9px 8px;border-bottom:1px solid #eef1f4;vertical-align:top}
+  .time{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .flight{font-size:11.5px;color:var(--muted)}
+  .nm{font-weight:600}
+  .sm{font-size:11.5px;color:var(--muted)}
+  .tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10.5px;font-weight:700}
+  .t-ARRIVAL{background:#e8effb;color:#1f3864}
+  .t-DEPARTURE{background:#fdf1e3;color:#8a5a00}
+  .box{display:inline-block;border:1px solid var(--line);border-radius:6px;
+       min-width:92px;min-height:22px;padding:2px 6px;font-size:12px}
+  .note{background:#fff7e6;border-left:3px solid #e0b757;padding:5px 8px;font-size:12px;
+        border-radius:0 5px 5px 0;margin-top:4px;white-space:normal;max-width:280px}
+  .empty{padding:50px;text-align:center;color:var(--muted)}
+  .sumline{display:flex;gap:22px;flex-wrap:wrap;font-size:13px;color:var(--muted);
+           border-top:1px solid var(--line);margin-top:18px;padding-top:12px}
+  .sumline b{color:var(--ink)}
+  .sig{display:flex;gap:40px;margin-top:34px;font-size:12px;color:var(--muted)}
+  .sig div{flex:1;border-top:1px solid var(--line);padding-top:6px}
+
+  .auth-box{max-width:400px;margin:80px auto;padding:30px;background:#fff;border-radius:14px;
+            border:1px solid var(--line);text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.06)}
+
+  @media print{
+    body{background:#fff}
+    header,.noprint{display:none!important}
+    .sheet{border:0;border-radius:0;margin:0;padding:0;max-width:none}
+    .group{break-inside:avoid}
+    tr{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<div id="authArea" style="display:none">
+  <div class="auth-box">
+    <h2 style="margin-top:0">🔒 เข้าสู่ใบงานคนขับ</h2>
+    <p style="color:var(--muted);font-size:13px">กรุณากรอกรหัสแอดมิน (ADMIN KEY)</p>
+    <input type="password" id="keyInput" placeholder="กรอกรหัส ADMIN KEY" style="width:100%;padding:10px;margin:12px 0;border:1px solid var(--line);border-radius:8px;font-size:14px">
+    <button class="hbtn" style="width:100%;padding:10px;background:var(--navy)" onclick="submitKey()">เข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<div id="mainArea" style="display:none">
+  <header class="noprint">
+    <h1>📋 ใบงานคนขับ / Daily Driver Job Sheet</h1>
+    <div class="ctl">
+      <button class="hbtn" onclick="shift(-1)">‹ วันก่อน</button>
+      <input type="date" id="d">
+      <button class="hbtn" onclick="shift(1)">วันถัดไป ›</button>
+      <select id="fd"><option value="">คนขับ: ทั้งหมด</option></select>
+      <button class="hbtn" onclick="window.print()">🖨 พิมพ์</button>
+    </div>
+  </header>
+
+  <div class="sheet" id="sheet">
+    <div class="empty">กำลังโหลด…</div>
+  </div>
+</div>
+
+<!-- โหลดไฟล์การตั้งค่า API -->
+<script src="config.js"></script>
+
+<script>
+var SERVER_KEY = '<?= typeof adminKey !== "undefined" ? adminKey : "" ?>';
+var SERVER_URL = '<?= typeof webAppUrl !== "undefined" ? webAppUrl : "" ?>';
+
+var KEY = '';
+var JOBS = [], EVENT = '';
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+// คำนวณวันที่ตามเวลาท้องถิ่นเครื่องผู้ใช้ (Local Time) ป้องกันปัญหา UTC ข้ามวัน
+function today(){
+  var dt = new Date();
+  var y = dt.getFullYear();
+  var m = String(dt.getMonth() + 1).padStart(2, '0');
+  var d = String(dt.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + d;
+}
+
+function getApiUrl() {
+  if (typeof SERVER_URL !== 'undefined' && SERVER_URL && SERVER_URL.indexOf('<?') !== 0) {
+    return SERVER_URL;
+  }
+  return typeof CONFIG !== 'undefined' ? CONFIG.getApiUrl() : '';
+}
+
+function getAdminKey() {
+  if (typeof SERVER_KEY !== 'undefined' && SERVER_KEY && SERVER_KEY.indexOf('<?') !== 0) {
+    return SERVER_KEY;
+  }
+  var params = new URLSearchParams(window.location.search);
+  var k = params.get('key');
+  if (k && k.trim()) {
+    sessionStorage.setItem('swc26_adminkey', k.trim());
+    return k.trim();
+  }
+  return sessionStorage.getItem('swc26_adminkey') || '';
+}
+
+function submitKey() {
+  var val = document.getElementById('keyInput').value.trim();
+  if (val) {
+    sessionStorage.setItem('swc26_adminkey', val);
+    KEY = val;
+    document.getElementById('authArea').style.display = 'none';
+    document.getElementById('mainArea').style.display = '';
+    load();
+  }
+}
+
+function shift(n){
+  var el = document.getElementById('d');
+  var dt = new Date(el.value || today());
+  dt.setDate(dt.getDate() + n);
+  var y = dt.getFullYear();
+  var m = String(dt.getMonth() + 1).padStart(2, '0');
+  var d = String(dt.getDate()).padStart(2, '0');
+  el.value = y + '-' + m + '-' + d;
+  load();
+}
+
+async function load(){
+  var apiUrl = getApiUrl();
+  if (!apiUrl) {
+    document.getElementById('sheet').innerHTML = '<div class="empty">ยังไม่ได้ระบุ Web App URL ใน config.js</div>';
+    return;
+  }
+  if (!KEY) {
+    document.getElementById('authArea').style.display = '';
+    document.getElementById('mainArea').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('authArea').style.display = 'none';
+  document.getElementById('mainArea').style.display = '';
+
+  var d = document.getElementById('d').value || today();
+  document.getElementById('sheet').innerHTML = '<div class="empty">กำลังโหลด…</div>';
+
+  try {
+    var res = await fetch(apiUrl + (apiUrl.indexOf('?') >= 0 ? '&' : '?') +
+      'action=getDriverSheet&key=' + encodeURIComponent(KEY) + '&date=' + encodeURIComponent(d));
+    var r = await res.json();
+    if (r.unauthorized || r.error) {
+      if (r.unauthorized) {
+        sessionStorage.removeItem('swc26_adminkey');
+        KEY = '';
+        document.getElementById('authArea').style.display = '';
+        document.getElementById('mainArea').style.display = 'none';
+        return;
+      }
+      throw new Error(r.error);
+    }
+
+    JOBS = r.jobs || [];
+    EVENT = r.event || 'Sawasdee Cup 2026';
+
+    var sel = document.getElementById('fd');
+    var cur = sel.value;
+    var names = {};
+    JOBS.forEach(function(j){ if(j.driver) names[j.driver] = 1; });
+    sel.innerHTML = '<option value="">คนขับ: ทั้งหมด</option>' +
+      Object.keys(names).sort().map(function(n){ return '<option value="'+esc(n)+'">'+esc(n)+'</option>'; }).join('') +
+      '<option value="__none">ยังไม่มอบหมาย</option>';
+    sel.value = cur;
+
+    render(r.date || d);
+  } catch (err) {
+    document.getElementById('sheet').innerHTML = '<div class="empty">โหลดไม่สำเร็จ: ' + esc(err.message) + '</div>';
+  }
+}
+
+function thaiDate(s){
+  if(!s) return '';
+  var dt = new Date(s + 'T00:00:00');
+  var days = ['อาทิตย์','จันทร์','อังคาร','พุธ','พฤหัสบดี','ศุกร์','เสาร์'];
+  var mon = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return 'วัน' + days[dt.getDay()] + 'ที่ ' + dt.getDate() + ' ' + mon[dt.getMonth()] + ' ' + (dt.getFullYear()+543);
+}
+
+function render(dateStr){
+  var f = document.getElementById('fd').value;
+  var jobs = JOBS.filter(function(j){
+    if (f === '__none') return !j.driver;
+    if (f) return j.driver === f;
+    return true;
+  });
+
+  var html = '<div class="head">' +
+    '<div><div class="t">ใบงานรับ-ส่ง / Transfer Job Sheet</div>' +
+    '<div class="d">' + esc(EVENT) + '</div></div>' +
+    '<div style="text-align:right"><div class="big">' + esc(dateStr) + '</div>' +
+    '<div class="d">' + thaiDate(dateStr) + '</div></div></div>';
+
+  if (!jobs.length){
+    html += '<div class="empty">ไม่มีเที่ยวรถในวันนี้ / No transfers scheduled</div>';
+    document.getElementById('sheet').innerHTML = html;
+    return;
+  }
+
+  // จัดกลุ่มงาน: ขาเข้าจัดตามสนามบินรับ (from) / ขากลับจัดตามสนามบินส่ง (to)
+  var groups = {};
+  jobs.forEach(function(j){
+    var k = (j.leg === 'ARRIVAL')
+      ? ('ARRIVAL — ' + j.from)
+      : ('DEPARTURE — ' + j.to);
+    (groups[k] = groups[k] || []).push(j);
+  });
+
+  Object.keys(groups).sort().forEach(function(k){
+    var list = groups[k];
+    html += '<div class="group"><h3>' + esc(k) + ' (' + list.length + ' เที่ยว)</h3>' +
+      '<table><thead><tr>' +
+      '<th style="width:78px">เวลา</th><th style="width:74px">เที่ยว</th>' +
+      '<th>ผู้โดยสาร</th><th>' + (k.indexOf('ARRIVAL') === 0 ? 'ปลายทาง (ส่ง)' : 'จุดรับ (ขึ้นรถ)') + '</th><th style="width:96px">รถ</th>' +
+      '<th style="width:150px">คนขับ / ทะเบียน</th><th style="width:96px">ลงชื่อรับ</th>' +
+      '</tr></thead><tbody>';
+
+    list.forEach(function(j){
+      var locDesc = (j.leg === 'ARRIVAL') ? j.to : j.from;
+      html += '<tr>' +
+        '<td><div class="time">' + esc(j.time) + '</div>' +
+            '<div class="flight">' + esc(j.flight) + '</div></td>' +
+        '<td><span class="tag t-' + j.leg + '">' + (j.leg==='ARRIVAL'?'ขาเข้า':'ขาออก') + '</span>' +
+            '<div class="flight">' + esc(j.bookingId) + '</div></td>' +
+        '<td><div class="nm">' + esc(j.name) + '</div>' +
+            '<div class="sm">' + esc(j.team||'') + (j.phone ? ' · ' + esc(j.phone) : '') +
+            ' · ' + esc(j.pax) + ' ท่าน</div>' +
+            (j.special ? '<div class="note">⚠ ' + esc(j.special) + '</div>' : '') + '</td>' +
+        '<td class="sm">' + esc(locDesc) + '</td>' +
+        '<td>' + esc(j.vehicle) + (j.vehicle!=='Shared ride' && j.qty>1 ? ' ×'+esc(j.qty) : '') + '</td>' +
+        '<td>' + (j.driver ? '<div class="nm">'+esc(j.driver)+'</div>' : '<span class="box"></span>') +
+            (j.plate ? '<div class="sm">'+esc(j.plate)+'</div>' : '<div style="margin-top:3px"><span class="box"></span></div>') +
+        '</td>' +
+        '<td><span class="box">&nbsp;</span></td>' +
+      '</tr>';
+    });
+    html += '</tbody></table></div>';
+  });
+
+  var pax = 0, cars = 0;
+  jobs.forEach(function(j){ pax += Number(j.pax)||0;
+    cars += (j.vehicle === 'Shared ride' ? 1 : (Number(j.qty)||1)); });
+
+  html += '<div class="sumline">' +
+    '<div>เที่ยวรถทั้งหมด <b>' + jobs.length + '</b></div>' +
+    '<div>จำนวนคันรวม <b>' + cars + '</b></div>' +
+    '<div>ผู้โดยสารรวม <b>' + pax + '</b> ท่าน</div>' +
+    '<div>ยังไม่มอบหมายคนขับ <b>' + jobs.filter(function(j){return !j.driver;}).length + '</b></div>' +
+  '</div>' +
+  '<div class="sig"><div>ผู้จัดรถ / Dispatcher</div><div>หัวหน้าทีม / Team lead</div>' +
+  '<div>วันที่พิมพ์ ' + new Date().toLocaleString('th-TH') + '</div></div>';
+
+  document.getElementById('sheet').innerHTML = html;
+}
+
+document.getElementById('d').value = today();
+document.getElementById('d').addEventListener('change', load);
+document.getElementById('fd').addEventListener('change', function(){ render(document.getElementById('d').value); });
+
+KEY = getAdminKey();
+load();
+</script>
+</body>
+</html>

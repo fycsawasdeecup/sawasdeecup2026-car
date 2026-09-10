@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>จองรถรับ-ส่ง / Transfer Booking — Sawasdee Cup 2026</title>
+<style>
+  :root{
+    --navy:#1f3864; --navy-2:#2b4a80; --ink:#14181f; --muted:#5b6472;
+    --line:#e3e6eb; --bg:#f4f6f9; --card:#ffffff; --gold:#c9a227;
+    --ok:#0f7b4f; --warn:#8a5a00; --warn-bg:#fff7e6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai",Helvetica,Arial,sans-serif;
+       font-size:15px;line-height:1.55}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px 64px}
+
+  header{background:var(--navy);color:#fff;padding:26px 0 46px;margin-bottom:-30px}
+  header .wrap{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+  h1{font-size:22px;margin:6px 0 2px;font-weight:700}
+  .sub{font-size:13px;opacity:.8}
+  .langbtn{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;
+           border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
+  .langbtn:hover{background:rgba(255,255,255,.24)}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;
+        padding:22px 22px 24px;margin-bottom:16px;box-shadow:0 1px 2px rgba(20,24,31,.04)}
+  .card h2{font-size:15px;margin:0 0 4px;font-weight:700;display:flex;align-items:center;gap:9px}
+  .num{width:23px;height:23px;border-radius:50%;background:var(--navy);color:#fff;
+       font-size:12px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+  .hint{font-size:13px;color:var(--muted);margin:0 0 16px 32px}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .full{grid-column:1/-1}
+  @media(max-width:620px){.grid{grid-template-columns:1fr}}
+
+  label{display:block;font-size:13px;font-weight:600;margin-bottom:5px}
+  label .req{color:#c0392b}
+  .en{font-weight:400;color:var(--muted)}
+  input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);
+        border-radius:9px;font:inherit;font-size:14px;background:#fff;color:var(--ink)}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--navy-2);
+        box-shadow:0 0 0 3px rgba(43,74,128,.12)}
+  textarea{resize:vertical;min-height:76px}
+  .err{border-color:#c0392b!important;background:#fff5f4}
+
+  .veh{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+  .veh label{border:1px solid var(--line);border-radius:11px;padding:12px 13px;cursor:pointer;
+             margin:0;font-weight:500;transition:.12s;background:#fff}
+  .veh label:hover{border-color:var(--navy-2)}
+  .veh input{display:none}
+  .veh label.sel{border-color:var(--navy);box-shadow:0 0 0 2px rgba(31,56,100,.13);background:#f8fafd}
+  .veh .vt{font-weight:700;font-size:14px;display:block}
+  .veh .vs{font-size:12px;color:var(--muted)}
+
+  .seg{display:flex;gap:10px;flex-wrap:wrap}
+  .seg label{flex:1;min-width:190px;border:1px solid var(--line);border-radius:11px;
+             padding:12px 14px;cursor:pointer;margin:0;font-weight:500;background:#fff}
+  .seg label.sel{border-color:var(--navy);box-shadow:0 0 0 2px rgba(31,56,100,.13);background:#f8fafd}
+  .seg input{display:none}
+  .seg b{display:block;font-size:14px}
+  .seg span{font-size:12px;color:var(--muted)}
+
+  #depCard[hidden]{display:none}
+
+  .quote{position:sticky;bottom:0;background:var(--navy);color:#fff;border-radius:14px;
+         padding:16px 20px;margin-top:6px;box-shadow:0 8px 24px rgba(20,24,31,.18)}
+  .qrow{display:flex;justify-content:space-between;font-size:13px;opacity:.85;padding:2px 0}
+  .qtot{display:flex;justify-content:space-between;align-items:baseline;
+        border-top:1px solid rgba(255,255,255,.22);margin-top:8px;padding-top:9px}
+  .qtot b{font-size:13px;font-weight:600;opacity:.85}
+  .qtot .amt{font-size:26px;font-weight:700;letter-spacing:-.01em}
+  .qnote{font-size:12px;background:rgba(255,255,255,.12);border-radius:8px;padding:8px 10px;margin-top:9px}
+
+  button.submit{width:100%;margin-top:14px;background:var(--gold);color:#241f00;border:0;
+        border-radius:10px;padding:14px;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+  button.submit:hover{filter:brightness(1.05)}
+  button.submit:disabled{opacity:.55;cursor:not-allowed}
+
+  .banner{border-radius:11px;padding:12px 14px;font-size:13.5px;margin-bottom:14px}
+  .banner.warn{background:var(--warn-bg);color:var(--warn);border:1px solid #f0dcae}
+  .banner.bad{background:#fff5f4;color:#a2271b;border:1px solid #f2c9c4}
+
+  .done{background:#fff;border:1px solid var(--line);border-radius:14px;padding:36px 28px;text-align:center}
+  .done .tick{width:56px;height:56px;border-radius:50%;background:#e8f5ef;color:var(--ok);
+        font-size:30px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+  .done .ref{font-size:30px;font-weight:700;color:var(--navy);letter-spacing:.03em;margin:10px 0 2px}
+  .done .lbl{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+  .done p{color:var(--muted);font-size:14px}
+  .linkbtn{display:inline-block;margin-top:14px;background:var(--navy);color:#fff;
+        text-decoration:none;padding:11px 22px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
+  .foot{text-align:center;font-size:12px;color:var(--muted);padding:8px 0 0}
+
+  .loading-card{text-align:center;padding:50px 20px;background:#fff;border-radius:14px;border:1px solid var(--line)}
+  .spinner{width:36px;height:36px;border:3px solid var(--line);border-top-color:var(--navy);border-radius:50%;
+           animation:spin 0.8s linear infinite;margin:0 auto 14px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Transfer Booking</div>
+      <h1 id="hTitle">จองรถรับ-ส่ง สนามบิน &ndash; โรงแรม/สนามแข่ง</h1>
+      <div class="sub" id="hEvent">Mizuno Pattaya International Badminton Sawasdee Cup 2026</div>
+    </div>
+    <button class="langbtn" id="langBtn" onclick="toggleLang()">EN</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div id="app"></div>
+
+  <div id="loading" class="loading-card">
+    <div class="spinner"></div>
+    <div style="font-weight:600">กำลังเชื่อมต่อระบบจองรถ…</div>
+    <div style="font-size:13px;color:var(--muted);margin-top:4px">Loading booking system, please wait…</div>
+  </div>
+
+  <form id="f" onsubmit="return false" style="display:none">
+
+    <!-- 1. ข้อมูลผู้โดยสาร -->
+    <div class="card">
+      <h2><span class="num">1</span><span data-th="ข้อมูลผู้โดยสาร" data-en="Passenger information"></span></h2>
+      <p class="hint" data-th="กรอกชื่อตามหนังสือเดินทาง เพื่อให้คนขับตรวจสอบได้ถูกต้อง"
+         data-en="Use the name exactly as printed on your passport."></p>
+      <div class="grid">
+        <div class="full">
+          <label><span data-th="ชื่อ-นามสกุล" data-en="Full name"></span> <span class="req">*</span>
+            <span class="en" id="lbName">/ Full Name</span></label>
+          <input id="fullName" required placeholder="นาย สมชาย ใจดี / John Doe">
+        </div>
+        <div>
+          <label><span data-th="เลขพาสปอร์ต / บัตรประชาชน" data-en="Passport No. / Citizen ID"></span>
+            <span class="req">*</span></label>
+          <input id="passport" required placeholder="AA1234567">
+        </div>
+        <div>
+          <label><span data-th="เบอร์โทรศัพท์" data-en="Phone number"></span> <span class="req">*</span></label>
+          <input id="phone" required placeholder="+66 ...">
+        </div>
+        <div>
+          <label><span data-th="อีเมล" data-en="Email"></span> <span class="req">*</span></label>
+          <input id="email" type="email" required placeholder="example@email.com">
+        </div>
+        <div>
+          <label><span data-th="ชื่อทีม (ถ้ามี)" data-en="Team name (optional)"></span></label>
+          <input id="team" placeholder="Team name / Country">
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. รถและเส้นทาง -->
+    <div class="card">
+      <h2><span class="num">2</span><span data-th="ประเภทรถและเส้นทาง" data-en="Vehicle &amp; route"></span></h2>
+      <p class="hint" data-th="เลือกประเภทรถ ระบบจะคำนวณราคาให้อัตโนมัติด้านล่าง"
+         data-en="Pick a vehicle — the price is calculated automatically below."></p>
+
+      <label><span data-th="ประเภทรถ" data-en="Vehicle type"></span> <span class="req">*</span></label>
+      <div class="veh" id="vehBox"></div>
+
+      <div class="grid" style="margin-top:14px">
+        <div>
+          <label><span data-th="จำนวนผู้โดยสาร" data-en="Number of passengers"></span> <span class="req">*</span></label>
+          <input id="pax" type="number" min="1" max="200" value="1">
+        </div>
+        <div id="qtyWrap">
+          <label><span data-th="จำนวนคัน" data-en="Number of vehicles"></span> <span class="req">*</span></label>
+          <input id="qty" type="number" min="1" max="20" value="1">
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <label><span data-th="ประเภทการเดินทาง" data-en="Travel details"></span> <span class="req">*</span></label>
+        <div class="seg" id="tripBox">
+          <label data-v="One way"><input type="radio" name="trip" value="One way" checked>
+            <b data-th="เที่ยวเดียว" data-en="One way"></b>
+            <span data-th="รับจากสนามบิน ส่งที่โรงแรม/สนามแข่ง" data-en="Drop-off only"></span></label>
+          <label data-v="Round trip"><input type="radio" name="trip" value="Round trip">
+            <b data-th="ไป-กลับ" data-en="Round trip"></b>
+            <span data-th="รับขาเข้า และส่งกลับสนามบิน" data-en="Arrival + return transfer"></span></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. เที่ยวบินขาเข้า -->
+    <div class="card">
+      <h2><span class="num">3</span><span data-th="เที่ยวบินขาเข้า" data-en="Arrival flight"></span></h2>
+      <p class="hint" data-th="กรุณาระบุเวลาที่เครื่องลงจอด (ตามเวลาประเทศไทย)"
+         data-en="Please give the scheduled landing time (Thailand time)."></p>
+      <div class="grid">
+        <div>
+          <label><span data-th="สนามบิน / จุดรับ" data-en="Pick-up location"></span> <span class="req">*</span></label>
+          <select id="arrFrom"></select>
+        </div>
+        <div>
+          <label><span data-th="จุดส่ง (โรงแรม/สนาม)" data-en="Drop-off location"></span> <span class="req">*</span></label>
+          <select id="arrTo"></select>
+        </div>
+        <div class="full" id="arrToOtherWrap" hidden>
+          <label><span data-th="ระบุที่อยู่ / ชื่อโรงแรมจุดส่ง" data-en="Specify drop-off address / hotel name"></span> <span class="req">*</span></label>
+          <input id="arrToOther" placeholder="กรุณาระบุชื่อโรงแรม หรือที่อยู่ปลายทาง">
+        </div>
+        <div>
+          <label><span data-th="หมายเลขเที่ยวบิน" data-en="Flight number"></span> <span class="req">*</span></label>
+          <input id="arrFlight" placeholder="TG 123 / FD 456">
+        </div>
+        <div></div>
+        <div>
+          <label><span data-th="วันที่เดินทางถึง" data-en="Arrival date"></span> <span class="req">*</span></label>
+          <input id="arrDate" type="date">
+        </div>
+        <div>
+          <label><span data-th="เวลาที่เครื่องลง" data-en="Arrival time"></span> <span class="req">*</span></label>
+          <input id="arrTime" type="time">
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. เที่ยวบินขากลับ -->
+    <div class="card" id="depCard" hidden>
+      <h2><span class="num">4</span><span data-th="เที่ยวบินขากลับ" data-en="Departure flight"></span></h2>
+      <p class="hint" data-th="รถจะรับก่อนเวลาบินประมาณ 3-4 ชั่วโมง ขึ้นอยู่กับสนามบิน"
+         data-en="Pick-up is normally 3-4 hours before departure, depending on the airport."></p>
+      <div class="grid">
+        <div>
+          <label><span data-th="จุดรับ (โรงแรม/สนาม)" data-en="Pick-up location"></span> <span class="req">*</span></label>
+          <select id="depFrom"></select>
+        </div>
+        <div>
+          <label><span data-th="สนามบินขาออก" data-en="Departure airport"></span> <span class="req">*</span></label>
+          <select id="depTo"></select>
+        </div>
+        <div class="full" id="depFromOtherWrap" hidden>
+          <label><span data-th="ระบุที่อยู่ / ชื่อโรงแรมจุดรับ" data-en="Specify pick-up address / hotel name"></span> <span class="req">*</span></label>
+          <input id="depFromOther" placeholder="กรุณาระบุชื่อโรงแรม หรือที่อยู่จุดรับ">
+        </div>
+        <div>
+          <label><span data-th="หมายเลขเที่ยวบิน" data-en="Flight number"></span> <span class="req">*</span></label>
+          <input id="depFlight" placeholder="TG 456 / FD 789">
+        </div>
+        <div></div>
+        <div>
+          <label><span data-th="วันที่เดินทางกลับ" data-en="Return date"></span> <span class="req">*</span></label>
+          <input id="depDate" type="date">
+        </div>
+        <div>
+          <label><span data-th="เวลาเครื่องออก" data-en="Departure time"></span> <span class="req">*</span></label>
+          <input id="depTime" type="time">
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. ข้อมูลเพิ่มเติม -->
+    <div class="card">
+      <h2><span class="num" id="num5">5</span><span data-th="ข้อมูลเพิ่มเติม" data-en="Additional information"></span></h2>
+      <div class="grid">
+        <div class="full">
+          <label><span data-th="คำขอพิเศษ (เช่น คาร์ซีท, กระเป๋าไม้แบดจำนวนมาก)"
+                       data-en="Special request (e.g. child seat, extra racket bags)"></span></label>
+          <textarea id="special" placeholder="ระบุความต้องการเพิ่มเติม (ถ้ามี)"></textarea>
+        </div>
+        <div>
+          <label><span data-th="ผู้ติดต่อสำรอง – ชื่อ" data-en="Contact person – name"></span></label>
+          <input id="contactName">
+        </div>
+        <div>
+          <label><span data-th="ผู้ติดต่อสำรอง – เบอร์โทร" data-en="Contact person – phone"></span></label>
+          <input id="contactPhone">
+        </div>
+      </div>
+    </div>
+
+    <div id="msg"></div>
+
+    <div class="quote">
+      <div id="qLines"></div>
+      <div class="qtot">
+        <b data-th="ยอดรวมโดยประมาณ" data-en="Estimated total"></b>
+        <div class="amt" id="qTotal">&mdash;</div>
+      </div>
+      <div class="qnote" id="qNote" hidden></div>
+      <button class="submit" id="btn" onclick="submitForm()">
+        <span data-th="ยืนยันการจอง" data-en="Confirm booking"></span>
+      </button>
+    </div>
+
+    <p class="foot" data-th="เมื่อกดยืนยัน ระบบจะส่งอีเมลยืนยันพร้อมหมายเลขการจองให้ท่านทันที"
+       data-en="A confirmation email with your booking number is sent immediately."></p>
+  </form>
+</div>
+
+<!-- โหลดไฟล์การตั้งค่า API -->
+<script src="config.js"></script>
+
+<script>
+var SERVER_URL = '<?= typeof webAppUrl !== "undefined" ? webAppUrl : "" ?>';
+var BOOT = null;
+var LANG = 'th';
+
+function getApiUrl() {
+  if (typeof SERVER_URL !== 'undefined' && SERVER_URL && SERVER_URL.indexOf('<?') !== 0) {
+    return SERVER_URL;
+  }
+  return typeof CONFIG !== 'undefined' ? CONFIG.getApiUrl() : '';
+}
+
+/* ---------- เริ่มต้นและดึงข้อมูลจาก API ---------- */
+async function initApp() {
+  var apiUrl = getApiUrl();
+  if (!apiUrl) {
+    var promptUrl = prompt('กรุณาระบุ Google Apps Script Web App URL (ลงท้ายด้วย /exec):\nPlease enter your Google Apps Script Web App URL:');
+    if (promptUrl && promptUrl.trim()) {
+      CONFIG.setApiUrl(promptUrl.trim());
+      apiUrl = promptUrl.trim();
+    } else {
+      document.getElementById('loading').innerHTML =
+        '<div class="banner bad"><b>ยังไม่ได้กำหนด Web App URL</b><br>กรุณาระบุ URL ในไฟล์ <code>config.js</code> หรือเปิดด้วย <code>?api=YOUR_URL</code></div>';
+      return;
+    }
+  }
+
+  try {
+    var res = await fetch(apiUrl + (apiUrl.indexOf('?') >= 0 ? '&' : '?') + 'action=getFormData');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    BOOT = await res.json();
+    if (BOOT.error) throw new Error(BOOT.error);
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('f').style.display = '';
+
+    document.getElementById('hEvent').textContent = BOOT.event || 'Sawasdee Cup 2026';
+    renderVehicles();
+    renderLocations();
+    onTripChange();
+
+    document.querySelectorAll('input[name=trip]').forEach(function(r){ r.onchange = onTripChange; });
+    document.querySelectorAll('#tripBox label').forEach(function(l){
+      l.onclick = function(){ l.querySelector('input').checked = true; onTripChange(); };
+    });
+    document.getElementById('pax').addEventListener('input', function(){ autoQty(); updateQuote(); });
+    document.getElementById('qty').addEventListener('input', updateQuote);
+    document.getElementById('arrFrom').addEventListener('change', updateQuote);
+    document.getElementById('depTo').addEventListener('change', updateQuote);
+    document.getElementById('arrTo').addEventListener('change', function(){ checkOther('arrTo','arrToOtherWrap'); });
+    document.getElementById('depFrom').addEventListener('change', function(){ checkOther('depFrom','depFromOtherWrap'); });
+
+    applyLang();
+  } catch (err) {
+    document.getElementById('loading').innerHTML =
+      '<div class="banner bad"><b>เชื่อมต่อระบบไม่สำเร็จ (Failed to connect)</b><br>' + err.message +
+      '<br><br><button class="langbtn" onclick="location.reload()" style="color:#14181f;background:#fff">ลองใหม่ / Retry</button></div>';
+  }
+}
+
+/* ---------- สลับภาษา ---------- */
+function applyLang(){
+  document.querySelectorAll('[data-th]').forEach(function(el){
+    el.textContent = (LANG === 'th') ? el.getAttribute('data-th') : el.getAttribute('data-en');
+  });
+  document.getElementById('langBtn').textContent = (LANG === 'th') ? 'EN' : 'ไทย';
+  document.getElementById('hTitle').textContent = (LANG === 'th')
+    ? 'จองรถรับ-ส่ง สนามบิน – โรงแรม/สนามแข่ง'
+    : 'Airport ⇄ Hotel / Venue Transfer Booking';
+  document.getElementById('lbName').textContent = (LANG === 'th') ? '/ Full Name' : '';
+  renderVehicles();
+  renderLocations();
+  updateQuote();
+}
+function toggleLang(){ LANG = (LANG === 'th') ? 'en' : 'th'; applyLang(); }
+
+/* ---------- เลือกรถ ---------- */
+function renderVehicles(){
+  if (!BOOT || !BOOT.vehicles) return;
+  var cur = selectedVehicle();
+  var box = document.getElementById('vehBox');
+  box.innerHTML = BOOT.vehicles.map(function(v, i){
+    var checked = cur ? (cur === v.id) : (i === 0);
+    return '<label data-v="'+v.id+'" class="'+(checked?'sel':'')+'">' +
+      '<input type="radio" name="veh" value="'+v.id+'" '+(checked?'checked':'')+'>' +
+      '<span class="vt">'+(LANG==='th'?v.th:v.en)+'</span>' +
+      '<span class="vs">'+(v.id==='Shared ride'
+          ? (LANG==='th'?'คิดราคาต่อคน':'priced per person')
+          : (LANG==='th'?('สูงสุด '+v.cap+' ท่าน'):('up to '+v.cap+' pax')))+'</span></label>';
+  }).join('');
+  box.querySelectorAll('label').forEach(function(l){
+    l.onclick = function(){
+      box.querySelectorAll('label').forEach(function(x){ x.classList.remove('sel'); });
+      l.classList.add('sel');
+      l.querySelector('input').checked = true;
+      onVehicleChange();
+    };
+  });
+}
+function selectedVehicle(){
+  var el = document.querySelector('input[name=veh]:checked');
+  return el ? el.value : null;
+}
+function onVehicleChange(){
+  var v = selectedVehicle();
+  document.getElementById('qtyWrap').style.display = (v === 'Shared ride') ? 'none' : '';
+  autoQty();
+  updateQuote();
+}
+function autoQty(){
+  var v = selectedVehicle(); if(!v || v === 'Shared ride') return;
+  var cap = 3;
+  BOOT.vehicles.forEach(function(x){ if(x.id === v) cap = x.cap; });
+  var pax = parseInt(document.getElementById('pax').value || '1', 10);
+  var need = Math.max(1, Math.ceil(pax / cap));
+  var q = document.getElementById('qty');
+  if (parseInt(q.value || '1', 10) < need) q.value = need;
+}
+
+/* ---------- จุดรับ-ส่ง ---------- */
+function opts(list){
+  return list.map(function(o){
+    return '<option value="'+o.id+'">'+(LANG==='th'?o.th:o.en)+'</option>';
+  }).join('');
+}
+function hotelOpts(){
+  return BOOT.hotels.map(function(h){ return '<option value="'+h+'">'+h+'</option>'; }).join('');
+}
+function renderLocations(){
+  if (!BOOT) return;
+  var keep = {};
+  ['arrFrom','arrTo','depFrom','depTo'].forEach(function(id){
+    var el = document.getElementById(id); if(el) keep[id] = el.value;
+  });
+  document.getElementById('arrFrom').innerHTML = opts(BOOT.locations);
+  document.getElementById('depTo').innerHTML   = opts(BOOT.locations);
+  document.getElementById('arrTo').innerHTML   = hotelOpts();
+  document.getElementById('depFrom').innerHTML = hotelOpts();
+  Object.keys(keep).forEach(function(id){
+    if(keep[id]) document.getElementById(id).value = keep[id];
+  });
+}
+
+/* ---------- คำนวณราคา ---------- */
+function findPrice(vehicle, location){
+  if (!BOOT || !BOOT.pricing) return null;
+  for (var i = 0; i < BOOT.pricing.length; i++){
+    var p = BOOT.pricing[i];
+    if (p.vehicle === vehicle && p.location === location) return p;
+  }
+  return null;
+}
+function baht(n){ return Number(n).toLocaleString('en-US') + ' ฿'; }
+
+function updateQuote(){
+  if (!BOOT) return;
+  var v = selectedVehicle();
+  var trip = document.querySelector('input[name=trip]:checked').value;
+  var pax = Math.max(1, parseInt(document.getElementById('pax').value || '1', 10));
+  var qty = Math.max(1, parseInt(document.getElementById('qty').value || '1', 10));
+  var units = (v === 'Shared ride') ? pax : qty;
+
+  var lines = [], total = 0, missing = false;
+
+  var a = findPrice(v, document.getElementById('arrFrom').value);
+  var aPrice = a ? a.price * units : 0;
+  if (!a || a.price === 0) missing = true;
+  total += aPrice;
+  lines.push(['· ' + (LANG==='th' ? 'ขาเข้า' : 'Arrival') +
+    (units > 1 ? ' × ' + units : ''), aPrice]);
+
+  if (trip === 'Round trip'){
+    var d = findPrice(v, document.getElementById('depTo').value);
+    var dPrice = d ? d.price * units : 0;
+    if (!d || d.price === 0) missing = true;
+    total += dPrice;
+    lines.push(['· ' + (LANG==='th' ? 'ขาออก' : 'Departure') +
+      (units > 1 ? ' × ' + units : ''), dPrice]);
+  }
+
+  document.getElementById('qLines').innerHTML = lines.map(function(l){
+    return '<div class="qrow"><span>'+l[0]+'</span><span>'+
+      (missing && l[1] === 0 ? '—' : baht(l[1]))+'</span></div>';
+  }).join('');
+
+  var note = document.getElementById('qNote');
+  if (missing){
+    document.getElementById('qTotal').textContent = (LANG==='th' ? 'รอเสนอราคา' : 'On request');
+    note.hidden = false;
+    note.textContent = (LANG==='th')
+      ? 'เส้นทาง/ประเภทรถนี้ยังไม่มีราคามาตรฐาน กรุณากดยืนยัน แล้วเจ้าหน้าที่จะติดต่อแจ้งราคาให้ท่าน'
+      : 'This combination needs a manual quote. Submit the form and our team will contact you with the price.';
+  } else {
+    document.getElementById('qTotal').textContent = baht(total);
+    note.hidden = true;
+  }
+}
+
+/* ---------- ท่องเที่ยว ไป-กลับ / อื่นๆ ---------- */
+function onTripChange(){
+  var trip = document.querySelector('input[name=trip]:checked').value;
+  document.getElementById('depCard').hidden = (trip !== 'Round trip');
+  document.getElementById('num5').textContent = (trip === 'Round trip') ? '5' : '4';
+  document.querySelectorAll('#tripBox label').forEach(function(l){
+    l.classList.toggle('sel', l.getAttribute('data-v') === trip);
+  });
+  updateQuote();
+}
+
+function checkOther(selId, wrapId){
+  var v = document.getElementById(selId).value || '';
+  document.getElementById(wrapId).hidden = (v.indexOf('Other') !== 0);
+}
+
+/* ---------- ส่งข้อมูลการจอง (submitForm) ---------- */
+function val(id){ return (document.getElementById(id).value || '').trim(); }
+
+function markErrors(ids){
+  document.querySelectorAll('.err').forEach(function(e){ e.classList.remove('err'); });
+  ids.forEach(function(id){
+    var el = document.getElementById(id); if (el) el.classList.add('err');
+  });
+  if (ids.length) document.getElementById(ids[0]).scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+async function submitForm(){
+  var trip = document.querySelector('input[name=trip]:checked').value;
+  var need = ['fullName','passport','phone','email','arrFlight','arrDate','arrTime'];
+  if (trip === 'Round trip') need = need.concat(['depFlight','depDate','depTime']);
+
+  // ตรวจสอบโรงแรม Other
+  if (val('arrTo').indexOf('Other') === 0 && !val('arrToOther')) {
+    need.push('arrToOther');
+  }
+  if (trip === 'Round trip' && val('depFrom').indexOf('Other') === 0 && !val('depFromOther')) {
+    need.push('depFromOther');
+  }
+
+  var bad = need.filter(function(id){ return !val(id); });
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email'))) bad.push('email');
+
+  if (bad.length){
+    markErrors(bad);
+    showMsg('bad', LANG==='th'
+      ? 'กรุณากรอกข้อมูลในช่องที่ไฮไลต์ให้ครบถ้วน'
+      : 'Please complete the highlighted fields.');
+    return;
+  }
+  markErrors([]);
+
+  var arrTo = val('arrTo');
+  if (arrTo.indexOf('Other') === 0 && val('arrToOther')) arrTo = val('arrToOther');
+  var depFrom = val('depFrom');
+  if (depFrom.indexOf('Other') === 0 && val('depFromOther')) depFrom = val('depFromOther');
+
+  var bookingData = {
+    fullName: val('fullName'), passport: val('passport'), phone: val('phone'),
+    email: val('email'), team: val('team'),
+    pax: parseInt(val('pax') || '1', 10),
+    vehicle: selectedVehicle(),
+    qty: parseInt(val('qty') || '1', 10),
+    tripType: trip,
+    arrFlight: val('arrFlight'), arrDate: val('arrDate'), arrTime: val('arrTime'),
+    arrFrom: val('arrFrom'), arrTo: arrTo,
+    depFlight: trip === 'Round trip' ? val('depFlight') : '',
+    depDate  : trip === 'Round trip' ? val('depDate') : '',
+    depTime  : trip === 'Round trip' ? val('depTime') : '',
+    depFrom  : trip === 'Round trip' ? depFrom : '',
+    depTo    : trip === 'Round trip' ? val('depTo') : '',
+    special: val('special'), contactName: val('contactName'), contactPhone: val('contactPhone')
+  };
+
+  var btn = document.getElementById('btn');
+  btn.disabled = true;
+  btn.innerHTML = (LANG==='th' ? 'กำลังบันทึก…' : 'Submitting…');
+
+  try {
+    var apiUrl = getApiUrl();
+    // ใช้ text/plain body เพื่อหลีกเลี่ยง CORS Preflight OPTIONS บน Google Apps Script
+    var res = await fetch(apiUrl, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'submitBooking',
+        booking: bookingData
+      })
+    });
+    var data = await res.json();
+    if (data.error) throw new Error(data.error);
+    onDone(data);
+  } catch (err) {
+    btn.disabled = false;
+    btn.innerHTML = '<span>' + (LANG==='th' ? 'ยืนยันการจอง' : 'Confirm booking') + '</span>';
+    showMsg('bad', (LANG==='th' ? 'เกิดข้อผิดพลาด: ' : 'Error: ') + err.message);
+  }
+}
+
+function showMsg(kind, text){
+  document.getElementById('msg').innerHTML =
+    '<div class="banner '+kind+'">'+text+'</div>';
+  document.getElementById('msg').scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function onDone(res){
+  var quoteOnly = (res.status === 'Quote');
+  document.getElementById('f').style.display = 'none';
+  document.getElementById('app').innerHTML =
+    '<div class="done">' +
+      '<div class="tick">✓</div>' +
+      '<h2 style="margin:0">' + (LANG==='th' ? 'บันทึกการจองเรียบร้อย' : 'Booking received') + '</h2>' +
+      '<div class="lbl" style="margin-top:16px">' +
+        (LANG==='th' ? 'หมายเลขการจอง' : 'Booking number') + '</div>' +
+      '<div class="ref">' + res.bookingId + '</div>' +
+      '<p>' + (quoteOnly
+        ? (LANG==='th'
+            ? 'เจ้าหน้าที่จะติดต่อแจ้งราคาสำหรับเส้นทางนี้ทางอีเมลของท่าน'
+            : 'Our team will email you a quote for this route shortly.')
+        : (LANG==='th'
+            ? 'ยอดรวม ' + baht(res.quote.total) + ' — เราได้ส่งอีเมลยืนยันไปยังอีเมลของท่านแล้ว'
+            : 'Total ' + baht(res.quote.total) + ' — a confirmation email is on its way.')) +
+      '</p>' +
+      '<p style="font-size:13px">' + (LANG==='th'
+          ? 'กรุณาเก็บหมายเลขนี้ไว้อ้างอิงเมื่อมีการเปลี่ยนแปลงเที่ยวบิน'
+          : 'Please keep this number for any flight changes.') + '</p>' +
+      '<a class="linkbtn" onclick="location.reload()">' +
+        (LANG==='th' ? 'จองเพิ่มอีกรายการ' : 'Make another booking') + '</a>' +
+    '</div>';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// เริ่มโหลดระบบ
+initApp();
+</script>
+</body>
+</html>
