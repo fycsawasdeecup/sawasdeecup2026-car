@@ -383,7 +383,9 @@ function renderVehicles(){
     return '<label data-v="'+v.id+'" class="'+(checked?'sel':'')+'">' +
       '<input type="radio" name="veh" value="'+v.id+'" '+(checked?'checked':'')+'>' +
       '<span class="vt">'+(LANG==='th'?v.th:v.en)+'</span>' +
-      '<span class="vs">'+(LANG==='th'?('สูงสุด '+v.cap+' ท่าน'):('up to '+v.cap+' pax'))+'</span></label>';
+      '<span class="vs">'+(v.id==='Bus 50'
+          ? (LANG==='th'?'สูงสุด 50 ท่าน · รอเสนอราคา':'up to 50 pax · Quote only')
+          : (LANG==='th'?('สูงสุด '+v.cap+' ท่าน'):('up to '+v.cap+' pax')))+'</span></label>';
   }).join('');
   box.querySelectorAll('label').forEach(function(l){
     l.onclick = function(){
@@ -438,6 +440,7 @@ function renderLocations(){
 
 /* ---------- คำนวณราคา ---------- */
 function findPrice(vehicle, location){
+  if (vehicle === 'Bus 50') return null; // รถบัสเป็นแบบรอเสนอราคาเสมอ
   if (!BOOT || !BOOT.pricing) return null;
   for (var i = 0; i < BOOT.pricing.length; i++){
     var p = BOOT.pricing[i];
@@ -459,7 +462,7 @@ function updateQuote(){
 
   var a = findPrice(v, document.getElementById('arrFrom').value);
   var aPrice = a ? a.price * units : 0;
-  if (!a || a.price === 0) missing = true;
+  if (!a || a.price === 0 || v === 'Bus 50') missing = true;
   total += aPrice;
   lines.push(['· ' + (LANG==='th' ? 'ขาเข้า' : 'Arrival') +
     (units > 1 ? ' × ' + units : ''), aPrice]);
@@ -467,7 +470,7 @@ function updateQuote(){
   if (trip === 'Round trip'){
     var d = findPrice(v, document.getElementById('depTo').value);
     var dPrice = d ? d.price * units : 0;
-    if (!d || d.price === 0) missing = true;
+    if (!d || d.price === 0 || v === 'Bus 50') missing = true;
     total += dPrice;
     lines.push(['· ' + (LANG==='th' ? 'ขาออก' : 'Departure') +
       (units > 1 ? ' × ' + units : ''), dPrice]);
@@ -475,19 +478,26 @@ function updateQuote(){
 
   document.getElementById('qLines').innerHTML = lines.map(function(l){
     return '<div class="qrow"><span>'+l[0]+'</span><span>'+
-      (missing && l[1] === 0 ? '—' : baht(l[1]))+'</span></div>';
+      (missing && l[1] === 0 ? (LANG==='th' ? 'รอเสนอราคา' : 'Quote') : baht(l[1]))+'</span></div>';
   }).join('');
 
   var note = document.getElementById('qNote');
   if (missing){
     document.getElementById('qTotal').textContent = (LANG==='th' ? 'รอเสนอราคา' : 'On request');
     note.hidden = false;
-    note.textContent = (LANG==='th')
-      ? 'เส้นทาง/ประเภทรถนี้ยังไม่มีราคามาตรฐาน กรุณากดยืนยัน แล้วเจ้าหน้าที่จะติดต่อแจ้งราคาให้ท่าน'
-      : 'This combination needs a manual quote. Submit the form and our team will contact you with the price.';
+    if (v === 'Bus 50') {
+      note.textContent = (LANG==='th')
+        ? 'รถบัส 50 ที่นั่งเป็นบริการพิเศษ เจ้าหน้าที่จะติดต่อเสนอราคาให้ท่านโดยตรง'
+        : 'Bus (50 seats) is on request. Our team will contact you with a customized quote.';
+    } else {
+      note.textContent = (LANG==='th')
+        ? 'เส้นทาง/ประเภทรถนี้ยังไม่มีราคามาตรฐาน กรุณากดยืนยัน แล้วเจ้าหน้าที่จะติดต่อแจ้งราคาให้ท่าน'
+        : 'This combination needs a manual quote. Submit the form and our team will contact you with the price.';
+    }
   } else {
     document.getElementById('qTotal').textContent = baht(total);
     note.hidden = true;
+  }
   }
 }
 
