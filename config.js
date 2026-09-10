@@ -8,7 +8,7 @@
 
 const CONFIG = {
   // นำ Web app URL จาก Apps Script มาวางตรงนี้ เช่น 'https://script.google.com/macros/s/AKfycbx.../exec'
-  API_URL: '',
+  API_URL: 'https://script.google.com/macros/s/AKfycbx7qTkiT5sRjZ33ktxr_H2EC7X5tyGCzo3IrDZ66HpJVPyu5BHP5Nsyon-Uyyu49M6vkQ/exec',
 
   // ฟังก์ชันดึง URL ที่ใช้งานจริง (รองรับ query parameter ?api= และ localStorage)
   getApiUrl: function() {
