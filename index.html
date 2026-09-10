@@ -440,7 +440,6 @@ function renderLocations(){
 
 /* ---------- คำนวณราคา ---------- */
 function findPrice(vehicle, location){
-  if (vehicle === 'Bus 50') return null; // รถบัสเป็นแบบรอเสนอราคาเสมอ
   if (!BOOT || !BOOT.pricing) return null;
   for (var i = 0; i < BOOT.pricing.length; i++){
     var p = BOOT.pricing[i];
@@ -462,7 +461,7 @@ function updateQuote(){
 
   var a = findPrice(v, document.getElementById('arrFrom').value);
   var aPrice = a ? a.price * units : 0;
-  if (!a || a.price === 0 || v === 'Bus 50') missing = true;
+  if (!a || a.price === 0) missing = true;
   total += aPrice;
   lines.push(['· ' + (LANG==='th' ? 'ขาเข้า' : 'Arrival') +
     (units > 1 ? ' × ' + units : ''), aPrice]);
@@ -470,7 +469,7 @@ function updateQuote(){
   if (trip === 'Round trip'){
     var d = findPrice(v, document.getElementById('depTo').value);
     var dPrice = d ? d.price * units : 0;
-    if (!d || d.price === 0 || v === 'Bus 50') missing = true;
+    if (!d || d.price === 0) missing = true;
     total += dPrice;
     lines.push(['· ' + (LANG==='th' ? 'ขาออก' : 'Departure') +
       (units > 1 ? ' × ' + units : ''), dPrice]);
