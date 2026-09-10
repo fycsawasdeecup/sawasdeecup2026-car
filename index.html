@@ -383,9 +383,7 @@ function renderVehicles(){
     return '<label data-v="'+v.id+'" class="'+(checked?'sel':'')+'">' +
       '<input type="radio" name="veh" value="'+v.id+'" '+(checked?'checked':'')+'>' +
       '<span class="vt">'+(LANG==='th'?v.th:v.en)+'</span>' +
-      '<span class="vs">'+(v.id==='Shared ride'
-          ? (LANG==='th'?'คิดราคาต่อคน':'priced per person')
-          : (LANG==='th'?('สูงสุด '+v.cap+' ท่าน'):('up to '+v.cap+' pax')))+'</span></label>';
+      '<span class="vs">'+(LANG==='th'?('สูงสุด '+v.cap+' ท่าน'):('up to '+v.cap+' pax'))+'</span></label>';
   }).join('');
   box.querySelectorAll('label').forEach(function(l){
     l.onclick = function(){
@@ -401,13 +399,11 @@ function selectedVehicle(){
   return el ? el.value : null;
 }
 function onVehicleChange(){
-  var v = selectedVehicle();
-  document.getElementById('qtyWrap').style.display = (v === 'Shared ride') ? 'none' : '';
   autoQty();
   updateQuote();
 }
 function autoQty(){
-  var v = selectedVehicle(); if(!v || v === 'Shared ride') return;
+  var v = selectedVehicle(); if(!v) return;
   var cap = 3;
   BOOT.vehicles.forEach(function(x){ if(x.id === v) cap = x.cap; });
   var pax = parseInt(document.getElementById('pax').value || '1', 10);
@@ -457,7 +453,7 @@ function updateQuote(){
   var trip = document.querySelector('input[name=trip]:checked').value;
   var pax = Math.max(1, parseInt(document.getElementById('pax').value || '1', 10));
   var qty = Math.max(1, parseInt(document.getElementById('qty').value || '1', 10));
-  var units = (v === 'Shared ride') ? pax : qty;
+  var units = qty;
 
   var lines = [], total = 0, missing = false;
 
